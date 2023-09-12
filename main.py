@@ -28,3 +28,19 @@ if __name__ == '__main__':
     assert parse('http://example.com/?') == {}
     assert parse('http://example.com/?name=Dima') == {'name': 'Dima'}
 
+
+def parse_cookie(query: str) -> dict:
+    if query == "":
+        return {}
+
+    cookies = {}
+    params = query.split(";")
+
+    for p in params:
+        if p == '':
+            continue
+        temp = p.partition("=")
+        cookies[temp[0]] = temp[2]
+
+    return cookies
+
