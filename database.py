@@ -1,13 +1,13 @@
 import sqlite3
-from random import random
-
+import random
 from faker import Faker
 
 fake = Faker()
+db_path = "music.db"
 
 
 def create_customers_table():
-    conn = sqlite3.connect('instance/music.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS customers (
                       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,7 +18,7 @@ def create_customers_table():
 
 
 def add_customers(count=100):
-    conn = sqlite3.connect('instance/music.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     for _ in range(count):
         first_name = fake.first_name()
@@ -31,7 +31,7 @@ def add_customers(count=100):
 
 
 def create_tracks_table():
-    conn = sqlite3.connect('instance/music.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS tracks (
                       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +42,7 @@ def create_tracks_table():
 
 
 def add_tracks(count=100):
-    conn = sqlite3.connect('instance/music.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     for _ in range(100):
         artist = fake.name()

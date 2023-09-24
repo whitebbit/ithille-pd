@@ -1,16 +1,14 @@
 import sqlite3
 
 from flask import Flask, jsonify
-from faker import Faker
-import random
-import datetime
+import database as db
 
 app = Flask(__name__)
 
 
 @app.route('/names/', methods=['GET'])
 def unique_names():
-    conn = sqlite3.connect('instance/music.db')
+    conn = sqlite3.connect(db.db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(DISTINCT first_name) FROM customers")
     result = cursor.fetchone()
@@ -20,7 +18,7 @@ def unique_names():
 
 @app.route('/tracks/', methods=['GET'])
 def track_count():
-    conn = sqlite3.connect('instance/music.db')
+    conn = sqlite3.connect(db.db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM tracks")
     result = cursor.fetchone()
@@ -30,7 +28,7 @@ def track_count():
 
 @app.route('/tracks-sec/', methods=['GET'])
 def track_info():
-    conn = sqlite3.connect('instance/music.db')
+    conn = sqlite3.connect(db.db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT id, artist, duration_seconds, release_date FROM tracks")
     tracks = cursor.fetchall()
