@@ -44,7 +44,7 @@ def create_tracks_table():
 def add_tracks(count=100):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    for _ in range(100):
+    for _ in range(count):
         artist = fake.name()
         duration_seconds = random.randint(180, 600)
         release_date = fake.date_of_birth(minimum_age=18, maximum_age=50).strftime('%Y-%m-%d')
