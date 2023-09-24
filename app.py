@@ -1,61 +1,43 @@
-import csv
+import sqlite3
 
-import requests
+from flask import Flask, jsonify
 from faker import Faker
-from flask import Flask, jsonify, request
-import flask
+import random
+import datetime
 
 app = Flask(__name__)
-fake = Faker()
 
 
-@app.route('/requirements')
-def requirements():
-    with open('requirements.txt', 'r', encoding='utf-16') as file:
-        requirements = [line.replace('\x00', '').strip() for line in file.readlines()]
-
-    return flask.render_template('requirements.html', requirements=requirements)
-
-
-@app.route('/users/generate', methods=['GET'])
-def generate_users():
-    try:
-        count = int(request.args.get('count', 100))
-
-        if count < 1:
-            return jsonify({"error": "Count must be greater than 0"}), 400
-
-        users = [{"name": fake.name(), "email": fake.email()} for _ in range(count)]
-
-        return jsonify(users)
-
-    except ValueError:
-        return jsonify({"error": "Invalid count format"}), 400
+@app.route('/names/', methods=['GET'])
+def unique_names():
+    conn = sqlite3.connect('instance/music.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(DISTINCT first_name) FROM customers")
+    result = cursor.fetchone()
+    conn.close()
+    return jsonify({'count': result[0]})
 
 
-@app.route('/mean')
-def mean():
-    with open('hw.csv', 'r') as file:
-        csv_reader = list(csv.reader(file))
-
-        total_height = [float(row[1]) for row in csv_reader[1:-1]]
-        total_weight = [float(row[2]) for row in csv_reader[1:-1]]
-
-        mean_height = sum(total_height) / len(total_height) if len(total_height) > 0 else 0
-        mean_weight = sum(total_weight) / len(total_weight) if len(total_weight) > 0 else 0
-
-    return flask.render_template('mean.html', mean_height=mean_height, mean_weight=mean_weight)
+@app.route('/tracks/', methods=['GET'])
+def track_count():
+    conn = sqlite3.connect('instance/music.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM tracks")
+    result = cursor.fetchone()
+    conn.close()
+    return jsonify({'count': result[0]})
 
 
-@app.route("/space")
-def space():
-
-    try:
-        r = requests.get("http://api.open-notify.org/astros.json")
-        data = r.json()
-        return f"The number of astronauts in orbit: {data['number']}"
-    except Exception:
-        return jsonify({"error": "Connection error"}), 400
+@app.route('/tracks-sec/', methods=['GET'])
+def track_info():
+    conn = sqlite3.connect('instance/music.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, artist, duration_seconds, release_date FROM tracks")
+    tracks = cursor.fetchall()
+    conn.close()
+    track_info_list = [{'id': row[0], 'artist': row[1], 'duration_seconds': row[2], 'release_date': row[3]} for row in
+                       tracks]
+    return jsonify({'tracks': track_info_list})
 
 
 if __name__ == '__main__':
